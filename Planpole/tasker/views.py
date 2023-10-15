@@ -1,7 +1,8 @@
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Task
 from .forms import TaskForm
+from django.views.generic.list import ListView
 
 class TaskListView(ListView):
     model = Task

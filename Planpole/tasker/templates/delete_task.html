@@ -2,9 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Удаление задачи</title>
+    <!-- Подключение стилей Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-
+    <div class="container">
+        <h1>Удаление задачи</h1>
+        <p>Вы уверены, что хотите удалить эту задачу?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Удалить</button>
+            <a href="{% url 'task_list' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
 </body>
 </html>
