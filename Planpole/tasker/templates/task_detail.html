@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ task.title }}</h1>
+    <p>Описание: {{ task.description }}</p>
+    <p>Приоритет: {{ task.get_priority_display }}</p>
+    <p>Дата завершения: {{ task.due_date|date:"d/m/Y" }}</p>
+
+    {% if can_edit %}
+        <a href="{% url 'update_task' task.pk %}" class="btn btn-warning">Редактировать</a>
+        <a href="{% url 'delete_task' task.pk %}" class="btn btn-danger">Удалить</a>
+    {% endif %}
+</div>
+{% endblock %}
