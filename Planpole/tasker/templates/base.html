@@ -1,0 +1,80 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <style>
+body, html, .navbar, .navbar-light.bg-light {
+    background-color: #f0e2c7 !important;
+}
+.navbar {
+    justify-content: flex-start !important;
+}
+
+</style>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} Planpole {% endblock %}</title>
+    <!-- Здесь могут быть ссылки на стили и другие ресурсы -->
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <header>
+     <nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'task_list' %}">
+        <img src="{% static 'logo.png' %}" width="200" height="200" alt="Логотип">
+    </a>
+    <ul class="navbar-nav">
+        <li class="nav-item active">
+            <a class="nav-link" href="{% url 'task_list' %}">Задачи</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'create_task' %}">Добавить задачу</a>
+        </li>
+    </ul>
+          <div class="ml-auto">
+        <ul class="navbar-nav">
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <span class="nav-link">Привет, {{ user.username }}!</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Выход</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Вход</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'signup' %}">Регистрация</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+</nav>
+
+
+
+                <!-- Добавьте другие пункты навигации по мере необходимости -->
+            </ul>
+        </div>
+    </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Основное содержание страницы будет вставляться сюда -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <!-- Здесь может быть ваш подвал сайта -->
+    </footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

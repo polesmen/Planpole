@@ -1,20 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Добавление задачи</title>
+    <title>Создать задачу</title>
     <!-- Подключение стилей Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Добавление задачи</h1>
+        <h1>Создать задачу</h1>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-            <a href="{% url 'task_list' %}" class="btn btn-secondary">Отмена</a>
+            <button type="submit" class="btn btn-primary">Создать</button>
         </form>
+        <a href="{% url 'task_list' %}" class="btn btn-secondary">Назад к списку задач</a>
     </div>
 </body>
 </html>
+
+{% endblock %}
