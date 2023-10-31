@@ -70,15 +70,21 @@ class DeleteTaskView(DeleteView):
         return context
 
 def toggle_favorite(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-    user = request.user
+    # try:
+        task = get_object_or_404(Task, id=task_id)
+        user = request.user
 
-    favorite, created = FavoriteTask.objects.get_or_create(task=task, user=user)
+        favorite, created = FavoriteTask.objects.get_or_create(task=task, user=user)
+        if favorite:
+            return redirect('favorite_task_list')
+        return redirect('task_list')
+    #  except:
+    #     return redirect('task_list')
 
-    if not created:  # Если задача уже в избранном, удаляем её
-        favorite.delete()
-        return JsonResponse({'status': 'removed'})
-    return JsonResponse({'status': 'added'})
+    # if not created:  # Если задача уже в избранном, удаляем её
+    #     favorite.delete()
+    #     return JsonResponse({'status': 'removed'})
+    # return JsonResponse({'status': 'added'})
 
 class FavoriteTaskListView(ListView):
     model = Task

@@ -93,7 +93,7 @@
 function toggleFavorite(taskId, button) {
     $.ajax({
         type: 'POST',
-        url: `/task/${taskId}/toggle/favorite/`,
+        url: `/task/${taskId}/toggle-favorite/`,
         data: {
             'task_id': taskId,
             'csrfmiddlewaretoken': getCookie('csrftoken')
