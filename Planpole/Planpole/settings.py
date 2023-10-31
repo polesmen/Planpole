@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'Planpole.urls'
@@ -77,8 +78,14 @@ WSGI_APPLICATION = 'Planpole.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'mysql.connector.django',
+        'NAME': 'django',
+        'USER': 'root',
+        'PASSWORD': 'Poles16456156!',
+        'HOST': 'localhost'
+
     }
 }
 
@@ -131,3 +138,8 @@ TIME_FORMAT = 'H:i'
 
 LOGIN_REDIRECT_URL = 'base'
 LOGOUT_REDIRECT_URL = 'base'
+
+CORS_ALLOW_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]

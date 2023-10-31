@@ -2,18 +2,10 @@
 
 {% block content %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Список задач</title>
-    <!-- Подключение стилей Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
 <div class="container">
     <h1>Список задач</h1>
     <a href="{% url 'create_task' %}" class="btn btn-primary">Добавить задачу</a>
+
     <!-- Меню сортировки -->
     <div class="mb-3">
         Сортировать по:
@@ -21,6 +13,12 @@
         <a href="?order_by=due_date" class="btn btn-light btn-sm">Дате завершения</a>
         <a href="?order_by=priority" class="btn btn-light btn-sm">Приоритету</a>
     </div>
+
+    <form method="get" action="{% url 'task_list' %}">
+        <input type="text" name="q" placeholder="Поиск..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn btn-primary">Поиск</button>
+    </form>
+
     <table class="table table-striped">
         <thead>
         <tr>
@@ -33,11 +31,10 @@
         {% for task in tasks %}
         <tr>
             <td><a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
-                <p> {{ task.created_at|date:"d/m/Y" }} в {{ task.created_at|time:"H:i" }}</p></td>
-
+                <p>{{ task.created_at|date:"d/m/Y" }} в {{ task.created_at|time:"H:i" }}</p></td>
             <td>
-
                 <p>Приоритет: {{ task.get_priority_display }}</p>
+            </td>
             <td>
                 {% if task.is_completed %}
                 <span class="badge badge-success">Выполнено</span>
@@ -47,17 +44,89 @@
                 <a href="{% url 'update_task' task.pk %}" class="btn btn-warning">Редактировать</a>
                 <a href="{% url 'delete_task' task.pk %}" class="btn btn-danger">Удалить</a>
                 {% if task in favorite_tasks %}
-                <a href="{% url 'toggle_favorite' task.id %}" class="btn btn-secondary">Убрать из избранного</a>
+                <button class="btn btn-secondary toggle-favorite" data-task-id="{{ task.id }}">Убрать из избранного
+                </button>
                 {% else %}
-                <a href="{% url 'toggle_favorite' task.id %}" class="btn btn-secondary">Добавить в избранное</a>
+                <button class="btn btn-secondary toggle-favorite" data-task-id="{{ task.id }}">Добавить в избранное
+                </button>
                 {% endif %}
             </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
+
+    <!-- Элементы управления пагинацией -->
+    {% if tasks.has_other_pages %}
+    <ul class="pagination">
+        {% if tasks.has_previous %}
+        <li><a href="?{{ request.GET.urlencode }}&page={{ tasks.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in tasks.paginator.page_range %}
+        {% if tasks.number == i %}
+        <li class="active"><span>{{ i }}</span></li>
+        {% else %}
+        <li><a href="?{{ request.GET.urlencode }}&page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if tasks.has_next %}
+        <li><a href="?{{ request.GET.urlencode }}&page={{ tasks.next_page_number }}">&raquo;</a></li>
+        {% else %}
+        <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
 </div>
-</body>
-</html>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+    $('.toggle-favorite').click(function() {
+        const taskId = $(this).data('task-id');
+        toggleFavorite(taskId, $(this));
+    });
+});
+
+function toggleFavorite(taskId, button) {
+    $.ajax({
+        type: 'POST',
+        url: `/task/${taskId}/toggle/favorite/`,
+        data: {
+            'task_id': taskId,
+            'csrfmiddlewaretoken': getCookie('csrftoken')
+        },
+        success: function(response) {
+            if (response.status === 'added') {
+                button.text('Убрать из избранного');
+            } else if (response.status === 'removed') {
+                button.text('Добавить в избранное');
+            }
+        },
+        error: function() {
+            alert('Произошла ошибка. Попробуйте еще раз.');
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+</script>
+
 
 {% endblock %}

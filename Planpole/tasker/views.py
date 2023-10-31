@@ -7,26 +7,35 @@ from django.views.generic.list import ListView
 from django.shortcuts import redirect, get_object_or_404, render
 from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 
 class TaskListView(ListView):
     model = Task
     template_name = 'task_list.html'
     context_object_name = 'tasks'
+    paginate_by = 10
+
     def get_queryset(self):
-        order = self.request.GET.get('order_by', 'due_date')  # По умолчанию сортируем по 'due_date'
+        order = self.request.GET.get('order_by', 'due_date')
+
+        # Добавляем поиск
+        query = self.request.GET.get('q')
+
         # Если пользователь аутентифицирован, возвращаем его задачи
         if self.request.user.is_authenticated:
-            return Task.objects.filter(user=self.request.user).order_by(order)
+            tasks = Task.objects.filter(user=self.request.user)
+
+            # Фильтрация задач по ключевым словам
+            if query:
+                tasks = tasks.filter(title__icontains=query)
+
+            return tasks.order_by(order)
         # Если пользователь не аутентифицирован, возвращаем пустой список задач
         else:
             return Task.objects.none()
-
-    def get(self, request, *args, **kwargs):
-        # Если пользователь не аутентифицирован, перенаправляем на пустую страницу или другую страницу на ваш выбор
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('empty_page'))
-        return super().get(request, *args, **kwargs)
 
 class CreateTaskView(CreateView):
     model = Task
@@ -88,6 +97,11 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+@login_required
+def user_logout(request):
+    logout(request)
+    return redirect('empty_page')
+
 def empty_page(request):
     return render(request, 'empty_page.html')
 
@@ -106,4 +120,4 @@ def toggle_task_completion(request, task_id):
     if request.user == task.user:  # убедитесь, что текущий пользователь владелец этой задачи
         task.is_completed = not task.is_completed
         task.save()
-    return redirect('name_of_your_task_list_view')
+    return redirect('task_list')
